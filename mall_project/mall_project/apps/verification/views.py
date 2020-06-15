@@ -1,11 +1,18 @@
+import random
+import logging
 from django.http import HttpResponse
-from django.shortcuts import render
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
 # Create your views here.
-
+from mall_project.utils.yuntongxun.sms import CCP
 from mall_project.libs.captcha.captcha import captcha
+from .serializers import ImageCodeCheckSerializer
 from . import constants
+
+logger = logging.getLogger('django')
 
 
 class ImageCodeView(APIView):
@@ -22,3 +29,52 @@ class ImageCodeView(APIView):
         redis_conn.setex("img_%s" % image_code_id, constants.IMAGE_CODE_REDIS_EXPIRES, text)
 
         return HttpResponse(image, content_type="images/jpg")
+
+
+# url('^sms_codes/(?P<mobile>1[3-9]\d{9})/$', views.SMSCodeView.as_view()),
+class SMSCodeView(GenericAPIView):
+    """
+    短信验证码
+    传入参数：
+        mobile, image_code_id, text
+    """
+    serializer_class = ImageCodeCheckSerializer
+
+    def get(self, request, mobile):
+        # 检验参数
+        serializer = self.get_serializer(data=request.get_params)
+        serializer.is_valid(raise_exception=True)
+
+        # 生成验证码
+        sms_code = '%06d' % random.randint(0, 999999)
+
+        # 保存验证码
+        redis_conn = get_redis_connection('captcha')
+        # redis_conn.setex("sms_%s" % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
+        # redis_conn.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+
+        # redis管道
+        pl = redis_conn.pipline()
+        pl.setex("sms_%s" % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
+        pl.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+
+        # 通知redis管道执行命令
+        pl.execute()
+
+        # 发送短信
+        try:
+            ccp = CCP()
+            expires = constants.SMS_CODE_REDIS_EXPIRES // 60
+            ret = ccp.send_template_sms(mobile, [sms_code, expires], constants.SMS_CODE_TEMP_ID)
+        except Exception as e:
+            logger.error("发送验证码短信[异常][ mobile: %s, message: %s ]" % (mobile, e))
+            return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        else:
+            if ret == 0:
+                logger.info("发送验证码短信[正常][ mobile: %s ]" % mobile)
+                return Response({'message': 'OK'})
+            else:
+                logger.warning("发送验证码短信[失败][ mobile: %s ]" % mobile)
+                return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        # 返回
