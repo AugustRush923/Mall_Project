@@ -1,7 +1,7 @@
 import random
 import logging
 from django.http import HttpResponse
-from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
@@ -104,10 +104,3 @@ class MobileCountView(APIView):
         return Response(data)
 
 
-class UserView(CreateAPIView):
-    """
-    用户注册
-    传入参数：
-        username, password, password2, sms_code, mobile, allow
-    """
-    pass
