@@ -1,14 +1,14 @@
 import random
 import logging
 from django.http import HttpResponse
-from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
 # Create your views here.
-from mall_project.utils.yuntongxun.sms import CCP
 from mall_project.libs.captcha.captcha import captcha
+from celery_tasks.sms.tasks import send_sms_code
+from users.models import User
 from .serializers import ImageCodeCheckSerializer
 from . import constants
 
@@ -42,7 +42,7 @@ class SMSCodeView(GenericAPIView):
 
     def get(self, request, mobile):
         # 检验参数
-        serializer = self.get_serializer(data=request.get_params)
+        serializer = self.get_serializer(data=request.query_params)
         serializer.is_valid(raise_exception=True)
 
         # 生成验证码
@@ -54,27 +54,60 @@ class SMSCodeView(GenericAPIView):
         # redis_conn.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
 
         # redis管道
-        pl = redis_conn.pipline()
+        pl = redis_conn.pipeline()
         pl.setex("sms_%s" % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         pl.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
 
         # 通知redis管道执行命令
         pl.execute()
 
-        # 发送短信
-        try:
-            ccp = CCP()
-            expires = constants.SMS_CODE_REDIS_EXPIRES // 60
-            ret = ccp.send_template_sms(mobile, [sms_code, expires], constants.SMS_CODE_TEMP_ID)
-        except Exception as e:
-            logger.error("发送验证码短信[异常][ mobile: %s, message: %s ]" % (mobile, e))
-            return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        else:
-            if ret == 0:
-                logger.info("发送验证码短信[正常][ mobile: %s ]" % mobile)
-                return Response({'message': 'OK'})
-            else:
-                logger.warning("发送验证码短信[失败][ mobile: %s ]" % mobile)
-                return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        # # 发送短信
+        # try:
+        #     ccp = CCP()
+        #     expires = constants.SMS_CODE_REDIS_EXPIRES // 60
+        #     ret = ccp.send_template_sms(mobile, [sms_code, expires], constants.SMS_CODE_TEMP_ID)
+        #     print(ret)
+        # except Exception as e:
+        #     logger.error("发送验证码短信[异常][ mobile: %s, message: %s ]" % (mobile, e))
+        #     return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        # else:
+        #     if ret == 0:
+        #         logger.info("发送验证码短信[正常][ mobile: %s ]" % mobile)
+        #         return Response({'message': 'OK'})
+        #     else:
+        #         logger.warning("发送验证码短信[失败][ mobile: %s ]" % mobile)
+        #         return Response({'message': 'failed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
+        # 使用celery发送验证码
+        send_sms_code.delay(mobile, sms_code, constants.SMS_CODE_REDIS_EXPIRES, constants.SMS_CODE_TEMP_ID)
         # 返回
+        return Response({'message': 'OK'})
+
+
+class UsernameCountView(APIView):
+    def get(self, request, username):
+        count = User.objects.filter(username=username).count()
+        data = {
+            'username': username,
+            'count': count
+        }
+        return Response(data)
+
+
+class MobileCountView(APIView):
+    def get(self, request, mobile):
+        count = User.objects.filter(mobile=mobile).count()
+        data = {
+            'mobile': mobile,
+            'count': count
+        }
+        return Response(data)
+
+
+class UserView(CreateAPIView):
+    """
+    用户注册
+    传入参数：
+        username, password, password2, sms_code, mobile, allow
+    """
+    pass

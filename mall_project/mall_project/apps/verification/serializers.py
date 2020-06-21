@@ -14,6 +14,7 @@ class ImageCodeCheckSerializer(serializers.Serializer):
         # 查询真实图片验证码值
         redis_conn = get_redis_connection('captcha')
         real_image_code = redis_conn.get('img_%s' % image_code_id)
+        print(real_image_code)
         if not real_image_code:
             raise serializers.ValidationError("图片验证码无效")
 
