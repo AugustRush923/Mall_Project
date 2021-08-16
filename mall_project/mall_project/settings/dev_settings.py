@@ -76,17 +76,6 @@ WSGI_APPLICATION = 'mall_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',  # 数据库主机
-        'PORT': 3306,  # 数据库端口
-        'USER': 'mall',  # 数据库用户名
-        'PASSWORD': '1qaz@WSX',  # 数据库用户密码
-        'NAME': 'mall',  # 数据库名字
-    }
-}
-
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -207,3 +196,8 @@ CORS_ORIGIN_WHITELIST = (
     'api.mall.site:8000'
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
+
+try:
+    from .local_settings import *
+except ImportError:
+    print("请创建本地配置文件.")

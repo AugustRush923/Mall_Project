@@ -6,7 +6,7 @@ __pycache__/
 *.rdb
 # C extensions
 *.so
-
+local_settings.py
 # Distribution / packaging
 .Python
 build/
