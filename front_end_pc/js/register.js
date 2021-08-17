@@ -220,6 +220,12 @@ var vm = new Vue({
                         responseType: 'json'
                     })
                     .then(response => {
+                        // 记录用户登录状态
+                        sessionStorage.clear()
+                        localStorage.clear()
+                        localStorage.token = response.data.token
+                        localStorage.username = response.data.username
+                        localStorage.id = response.data.id
                         location.href = '/index.html';
                     })
                     .catch(error=> {
