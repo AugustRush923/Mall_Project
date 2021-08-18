@@ -17,9 +17,7 @@ import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # /Documents/meiduo/Mall_project/mall_project/mall_project/
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
-print(sys.path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -42,8 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+
     'users',
     'verification',
+    'areas',
 ]
 
 MIDDLEWARE = [
