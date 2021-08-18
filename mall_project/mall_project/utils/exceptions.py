@@ -16,6 +16,8 @@ def exception_handler(exc, context):
     :return: Response响应对象
     """
     # 调用drf框架原生的异常处理方法
+    print(exc)
+    print(context)
     response = drf_exception_handler(exc, context)
 
     if response is None:

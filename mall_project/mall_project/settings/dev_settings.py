@@ -218,6 +218,21 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
 }
+# 发邮件的后端定义
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+# smtp服务地址
+EMAIL_HOST = 'smtp.qq.com'
+# smtp服务端口
+EMAIL_PORT = 465
+# 发送邮件的邮箱
+EMAIL_HOST_USER = 'qbz95zhd@qq.com'
+# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = ''
+# 收件人看到的发件人
+EMAIL_FROM = 'August商城<qbz95zhd@qq.com>'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 try:
     from .local_settings import *
