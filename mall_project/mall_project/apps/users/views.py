@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import *
 
-from .serializers import CreateUserSerializer, UserDetailSerializer, EmailSerializer, UserAddressSerializer
+from .serializers import *
 from .models import User
 from .constants import USER_ADDRESS_COUNTS_LIMIT
 
@@ -36,6 +36,18 @@ class UserDetailView(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class PasswordUpdateView(UpdateAPIView):
+    serializer_class = UpdatePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        return super(PasswordUpdateView, self).update(request, *args, **kwargs)
 
 
 class EmailUpdateView(UpdateAPIView):

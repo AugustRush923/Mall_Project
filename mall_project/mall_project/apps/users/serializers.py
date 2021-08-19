@@ -96,6 +96,31 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'mobile', 'email', 'email_active']
 
 
+class UpdatePasswordSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(label="新密码", write_only=True, min_length=8, max_length=20)
+    confirm_password = serializers.CharField(label='确认密码', write_only=True, min_length=8, max_length=20)
+
+    class Meta:
+        model = User
+        fields = ['id', "password", "new_password", "confirm_password"]
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if not user.check_password(attrs['password']):
+            raise serializers.ValidationError('当前密码不对')
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError('两次密码不一致')
+        return attrs
+
+    def update(self, instance, validated_data):
+        validated_data.pop('password')
+        validated_data.pop('confirm_password')
+        print(validated_data)
+        instance.set_password(validated_data.get('new_password'))
+        instance.save()
+        return instance
+
+
 class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

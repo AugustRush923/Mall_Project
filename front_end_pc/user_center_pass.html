@@ -5,31 +5,39 @@
 	<title>美多商城-用户中心</title>
 	<link rel="stylesheet" type="text/css" href="css/reset.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/host.js"></script>
+    <script type="text/javascript" src="js/vue-2.5.16.js"></script>
+    <script type="text/javascript" src="js/axios-0.18.0.min.js"></script>
+    <script>
+        var user_id = sessionStorage.user_id || localStorage.user_id;
+        var token = sessionStorage.token || localStorage.token;
+        if (!(user_id && token)) {
+            location.href = '/login.html?next=/user_center_pass.html';
+        }
+    </script>
 </head>
 <body>
+	<div id="app" v-cloak>
 	<div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到美多商城!</div>
-			<div class="fr">
-				<div class="login_info fl">
-					欢迎您：<em>张 山</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="login.html">登录</a>
-					<span>|</span>
-					<a href="register.html">注册</a>
-				</div>
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>		
-	</div>
+        <div class="header" id="app1">
+            <div class="welcome fl">欢迎来到美多商城!</div>
+            <div class="fr">
+                <div class="login_btn fl">
+                    欢迎您：<em>{{ username }}</em>
+                    <span>|</span>
+                    <a @click="logout">退出</a>
+                </div>
+                <div class="user_link fl">
+                    <span>|</span>
+                    <a href="user_center_info.html">用户中心</a>
+                    <span>|</span>
+                    <a href="cart.html">我的购物车</a>
+                    <span>|</span>
+                    <a href="user_center_order.html">我的订单</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 	<div class="search_bar clearfix">
 		<a href="index.html" class="logo fl"><img src="images/logo.png"></a>
@@ -37,7 +45,7 @@
 		<div class="search_con fr mt40">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
-		</div>		
+		</div>
 	</div>
 
 	<div class="main_con clearfix">
@@ -53,25 +61,28 @@
 		<div class="right_content clearfix">
 				<div class="info_con clearfix">
 				<h3 class="common_title2">修改密码</h3>
-				<div class="site_con pass_change_con">			
-                    <form>
+				<div class="site_con pass_change_con">
+                    <form id="pass-form" @submit.prevent="on_submit">
                         <div class="form_group">
                             <label>当前密码：</label>
-                            <input type="password" name="">
+                            <input type="password" v-model="password" name="ipwd" id="ipwd">
+                        	<span v-show="error_password" class="error_tip">原密码不正确，请重新输入</span>
                         </div>
                         <div class="form_group">
                             <label>新密码：</label>
-                            <input type="password" name="">
+                            <input type="password" v-model="new_password" @blur="check_pwd" name="pwd" id="pwd">
+                        	<span v-show="error_new_password" class="error_tip">密码最少8位，最长20位</span>
                         </div>
                         <div class="form_group">
                             <label>确认新密码：</label>
-                            <input type="password" name="">
+                            <input type="password" v-model="confirm_password" @blur="check_cpwd" name="cpwd" id="cpwd">
+                        	<span v-show="error_confirm_password" class="error_tip">两次输入的密码不一致</span>
                         </div>
-                        <input type="button" name="" value="确 定" class="info_submit">
+                        <input type="submit" name="" value="确 定" class="info_submit">
                     </form>
             </div>
 				</div>
-		
+
 		</div>
 		</div>
 	</div>
@@ -86,11 +97,11 @@
 			<span>|</span>
 			<a href="#">招聘人才</a>
 			<span>|</span>
-			<a href="#">友情链接</a>		
+			<a href="#">友情链接</a>
 		</div>
 		<p>CopyRight © 2016 北京美多商业股份有限公司 All Rights Reserved</p>
 		<p>电话：010-****888    京ICP备*******8号</p>
 	</div>
-	
+<script type="text/javascript" src="js/user_center_pass.js"></script>
 </body>
 </html>
