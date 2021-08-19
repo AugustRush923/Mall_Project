@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework_extensions.cache.mixins import CacheResponseMixin
 # Create your views here.
 from .serializers import AreasSerializer, AreaSubsSerializer
 from .models import Area
@@ -16,7 +17,7 @@ class AreaSubsView(RetrieveAPIView):
     queryset = Area.objects.all()
 
 
-class AreaViewSet(ReadOnlyModelViewSet):
+class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):
     def get_queryset(self):
         if self.action == "list":
             return Area.objects.filter(parent__isnull=True)

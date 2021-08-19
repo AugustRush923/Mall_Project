@@ -234,6 +234,14 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_FROM = 'August商城<qbz95zhd@qq.com>'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+# DRF扩展
+REST_FRAMEWORK_EXTENSIONS = {
+    # 缓存时间
+    'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 60,
+    # 缓存存储
+    'DEFAULT_USE_CACHE': 'default',
+}
+
 try:
     from .local_settings import *
 except ImportError:
