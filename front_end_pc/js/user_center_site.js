@@ -40,14 +40,14 @@ var vm = new Vue({
             .catch(error => {
                 alert(error.response.data);
             });
-        axios.get(this.host + '/users/'+user_id+'/addresses/', {
+        axios.get(this.host + '/addresses/', {
                 headers: {
                     'Authorization': 'JWT ' + this.token
                 },
                 responseType: 'json'
             })
             .then(response => {
-                this.addresses = response.data.addresses;
+                this.addresses = response.data.address;
                 this.limit = response.data.limit;
                 this.default_address_id = response.data.default_address_id;
             })
@@ -163,24 +163,9 @@ var vm = new Vue({
                 alert('信息填写有误！');
             } else {
                 this.form_address.title = this.form_address.receiver;
-                if (this.editing_address_index) {
-                    // 修改地址
-                    axios.put(this.host + '/users/' + this.user_id + '/addresses/' + this.addresses[this.editing_address_index].id + '/', this.form_address, {
-                        headers: {
-                            'Authorization': 'JWT ' + this.token
-                        },
-                        responseType: 'json'
-                    })
-                    .then(response => {
-                        this.addresses[this.editing_address_index] = response.data;
-                        this.is_show_edit = false;
-                    })
-                    .catch(error => {
-                        alert(error.response.data.detail || error.response.data.message);
-                    })
-                } else {
+                if (this.editing_address_index === '') {
                     // 新增地址
-                    axios.post(this.host + '/users/' + this.user_id + '/addresses/', this.form_address, {
+                    axios.post(this.host + '/addresses/', this.form_address, {
                         headers: {
                             'Authorization': 'JWT ' + this.token
                         },
@@ -194,12 +179,28 @@ var vm = new Vue({
                     .catch(error => {
                         console.log(error.response.data);
                     })
+                } else {
+
+                    // 修改地址
+                    axios.put(this.host + '/addresses/' + this.addresses[this.editing_address_index].id + '/', this.form_address, {
+                        headers: {
+                            'Authorization': 'JWT ' + this.token
+                        },
+                        responseType: 'json'
+                    })
+                    .then(response => {
+                        this.addresses[this.editing_address_index] = response.data;
+                        this.is_show_edit = false;
+                    })
+                    .catch(error => {
+                        alert(error.response.data.detail || error.response.data.message);
+                    })
                 }
             }
         },
         // 删除地址
         del_address: function(index){
-            axios.delete(this.host + '/users/' + this.user_id + '/addresses/' + this.addresses[index].id + '/', {
+            axios.delete(this.host + '/addresses/' + this.addresses[index].id + '/', {
                     headers: {
                         'Authorization': 'JWT ' + this.token
                     },
@@ -215,7 +216,7 @@ var vm = new Vue({
         },
         // 设置默认地址
         set_default: function(index){
-            axios.put(this.host + '/users/' + this.user_id + '/addresses/' + this.addresses[index].id + '/status/', {}, {
+            axios.put(this.host + '/addresses/' + this.addresses[index].id + '/status/', {}, {
                     headers: {
                         'Authorization': 'JWT ' + this.token
                     },
@@ -241,7 +242,7 @@ var vm = new Vue({
             if (!this.input_title) {
                 alert("请填写标题后再保存！");
             } else {
-                axios.put(this.host + '/users/' + this.user_id + '/addresses/' + this.addresses[index].id + '/title/', {
+                axios.put(this.host + '/addresses/' + this.addresses[index].id + '/title/', {
                         title: this.input_title
                     }, {
                         headers: {
