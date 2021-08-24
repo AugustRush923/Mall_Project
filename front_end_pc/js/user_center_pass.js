@@ -83,6 +83,8 @@ var vm = new Vue({
                     .then(response => {
                         // 弹出修改成功，跳转到登录页面
                         alert("修改成功!");
+                        sessionStorage.clear()
+                        localStorage.clear()
                         return_url = '/login.html';
                         location.href = return_url;
                     })

@@ -27,7 +27,7 @@ SECRET_KEY = 'rd_ed8m4g*h61*^0zw^+*r^u2!!#s=v7!lcqcdc@o4slhg8!46'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'www.mall.site', 'api.mall.site']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.mall.site', 'api.mall.site']
 
 # Application definition
 
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'users',
     'verification',
     'areas',
+    'goods.apps.GoodsConfig',
+    'contents.apps.ContentsConfig'
 ]
 
 MIDDLEWARE = [
