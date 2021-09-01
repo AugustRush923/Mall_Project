@@ -1,3 +1,10 @@
+import os
+
+if not os.getenv('DJANGO_SETTINGS_MODULE'):
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'mall_project.settings.dev_settings'
+import django
+django.setup()
+
 from collections import OrderedDict
 from django.conf import settings
 from django.template import loader
@@ -5,7 +12,7 @@ import os
 import time
 
 from goods.models import GoodsChannel
-from .models import ContentCategory
+from contents.models import ContentCategory
 
 
 def generate_static_index_html():
@@ -48,3 +55,7 @@ def generate_static_index_html():
     file_path = os.path.join(settings.GENERATED_STATIC_HTML_FILES_DIR, 'index.html')
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(html_text)
+
+
+if __name__ == '__main__':
+    generate_static_index_html()
