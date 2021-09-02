@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, GenericAPIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import UpdateModelMixin, CreateModelMixin
 from rest_framework.response import Response
@@ -119,3 +119,24 @@ class AddressViewSet(CreateModelMixin, UpdateModelMixin, GenericViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
+    """
+    用户浏览历史记录
+    """
+    serializer_class = AddUsersHistorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = request.user.id
+
+        history = get_redis_connection('history').lrange(f"history_{user_id}", 0, -1)
+
+        skus = []
+
+        for sku_id in history:
+            sku = SKU.objects.get(id=sku_id)
+            skus.append(sku)
+        s = SKUSerializer(skus, many=True)
+        return Response(s.data)

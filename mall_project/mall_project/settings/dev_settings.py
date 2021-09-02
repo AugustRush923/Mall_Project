@@ -101,11 +101,18 @@ CACHES = {
         }
     },
     "captcha": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://127.0.0.1:6379/2",
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "history": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -253,7 +260,6 @@ DEFAULT_FILE_STORAGE = 'mall_project.utils.fastdfs.fdfs_storage.FastDFSStorage'
 # FastDFS
 FDFS_URL = 'http://image.mall.site:8888/'
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
-
 
 # 富文本编辑器ckeditor配置
 CKEDITOR_CONFIGS = {

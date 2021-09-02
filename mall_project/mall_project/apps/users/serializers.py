@@ -3,6 +3,8 @@ import re
 from django_redis import get_redis_connection
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
+
+from goods.models import SKU
 from .models import User, Address
 
 from celery_tasks.send_email.tasks import send_verify_mail
@@ -174,3 +176,48 @@ class AddressTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ('title',)
+
+
+class AddUsersHistorySerializer(serializers.ModelSerializer):
+    """
+    添加用户浏览历史序列化器
+    """
+    sku_id = serializers.IntegerField(label="商品sku编号", min_value=1)
+
+    def validate_sku_id(self, value):
+        """
+        检验sku-id是否存在
+        """
+        try:
+            SKU.objects.get(id=value)
+        except SKU.DoesNotExist:
+            raise serializers.ValidationError("该商品不存在")
+
+        return value
+
+    def create(self, validated_data):
+        """
+        保存到Redis
+        """
+        user_id = self.context['request'].user.id
+        sku_id = validated_data['sku_id']
+
+        redis_conn = get_redis_connection('history')
+        pl = redis_conn.pipline()
+
+        # 移除已经存在的本商品浏览记录
+        pl.lrem(f"history_{user_id}", 0, sku_id)
+        # 添加新的浏览记录
+        pl.lpush(f"history_{user_id}", sku_id)
+        # 只保存最多5条记录
+        pl.ltrim("history_%s" % user_id, 0, 4)
+
+        pl.excuate()
+
+        return validated_data
+
+
+class SKUSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SKU
+        fields = ['id', 'name', 'price', 'default_image_url', 'comments']
