@@ -140,3 +140,7 @@ class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
             skus.append(sku)
         s = SKUSerializer(skus, many=True)
         return Response(s.data)
+
+    def post(self, request):
+        data = self.create(request)
+        return Response(data)

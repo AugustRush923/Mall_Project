@@ -178,7 +178,7 @@ class AddressTitleSerializer(serializers.ModelSerializer):
         fields = ('title',)
 
 
-class AddUsersHistorySerializer(serializers.ModelSerializer):
+class AddUsersHistorySerializer(serializers.Serializer):
     """
     添加用户浏览历史序列化器
     """
@@ -203,7 +203,7 @@ class AddUsersHistorySerializer(serializers.ModelSerializer):
         sku_id = validated_data['sku_id']
 
         redis_conn = get_redis_connection('history')
-        pl = redis_conn.pipline()
+        pl = redis_conn.pipeline()
 
         # 移除已经存在的本商品浏览记录
         pl.lrem(f"history_{user_id}", 0, sku_id)
@@ -212,7 +212,7 @@ class AddUsersHistorySerializer(serializers.ModelSerializer):
         # 只保存最多5条记录
         pl.ltrim("history_%s" % user_id, 0, 4)
 
-        pl.excuate()
+        pl.execute()
 
         return validated_data
 
