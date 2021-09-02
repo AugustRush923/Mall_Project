@@ -12,9 +12,9 @@ var vm = new Vue({
         ordering: '-create_time', // 排序
         count: 0,  // 总数量
         skus: [], // 数据
-        cat1: '',  // 一级类别
-        cat2: '',  // 二级类别
-        cat3: '',  // 三级类别,
+        cat1: {url: '', category:{name:'', id:''}},  // 一级类别
+        cat2: {name:''},  // 二级类别
+        cat3: {name:''},  // 三级类别,
         cart_total_count: 0, // 购物车总数量
         cart: [], // 购物车数据
         hots: [], // 热销商品
@@ -76,6 +76,8 @@ var vm = new Vue({
             .catch(error => {
                 console.log(error.response.data)
             });
+        this.get_cart();
+        this.get_hot_goods();
     },
     methods: {
         logout(){
@@ -129,9 +131,43 @@ var vm = new Vue({
             }
         },
         // 获取购物车数据
-        get_cart: function(){
-
-        },
-
+        // get_cart: function(){
+        //     axios.get(this.host+'/cart/', {
+        //             headers: {
+        //                 'Authorization': 'JWT ' + this.token
+        //             },
+        //             responseType: 'json',
+        //             withCredentials: true
+        //         })
+        //         .then(response => {
+        //             this.cart = response.data;
+        //             this.cart_total_count = 0;
+        //             for(var i=0;i<this.cart.length;i++){
+        //                 if (this.cart[i].name.length>25){
+        //                     this.cart[i].name = this.cart[i].name.substring(0, 25) + '...';
+        //                 }
+        //                 this.cart_total_count += this.cart[i].count;
+        //
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.log(error.response.data);
+        //         })
+        // },
+        // 获取热销商品数据
+        // get_hot_goods: function(){
+        //     axios.get(this.host+'/categories/'+this.cat+'/hotskus/', {
+        //             responseType: 'json'
+        //         })
+        //         .then(response => {
+        //             this.hots = response.data;
+        //             for(var i=0; i<this.hots.length; i++){
+        //                 this.hots[i].url = '/goods/' + this.hots[i].id + '.html';
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.log(error.response.data);
+        //         })
+        // }
     }
 });

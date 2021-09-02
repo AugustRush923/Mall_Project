@@ -142,5 +142,4 @@ class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
         return Response(s.data)
 
     def post(self, request):
-        data = self.create(request)
-        return Response(data)
+        return self.create(request)

@@ -206,6 +206,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+
+    # 分页
+    'DEFAULT_PAGINATION_CLASS': 'mall_project.utils.pagination.StandardResultsSetPagination'
 }
 
 # 指明自定义的用户模型类
