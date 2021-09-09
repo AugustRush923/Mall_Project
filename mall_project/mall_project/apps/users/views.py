@@ -11,7 +11,7 @@ from rest_framework.status import *
 
 from .serializers import *
 from .models import User
-from .constants import USER_ADDRESS_COUNTS_LIMIT
+from mall_project.utils.constants import USER_ADDRESS_COUNTS_LIMIT
 
 
 class UserView(CreateAPIView):
@@ -35,6 +35,10 @@ class UserDetailView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        """
+        覆写父方法，默认父方法根据pk值去filter queryset
+        业务需要获取当前用户信息。
+        """
         return self.request.user
 
 
@@ -44,10 +48,6 @@ class PasswordUpdateView(UpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
-    def update(self, request, *args, **kwargs):
-        print(request.data)
-        return super(PasswordUpdateView, self).update(request, *args, **kwargs)
 
 
 class EmailUpdateView(UpdateAPIView):
@@ -121,6 +121,7 @@ class AddressViewSet(CreateModelMixin, UpdateModelMixin, GenericViewSet):
         return Response(serializer.data)
 
 
+# url(r'^browse_histories/$', views.UserBrowsingHistoryView.as_view()),
 class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
     """
     用户浏览历史记录
@@ -128,18 +129,22 @@ class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
     serializer_class = AddUsersHistorySerializer
     permission_classes = [IsAuthenticated]
 
+    # 以GET请求访问browse_histories/
     def get(self, request):
         user_id = request.user.id
-
+        # 获取history Redis中 history_user_id的所有elements
         history = get_redis_connection('history').lrange(f"history_{user_id}", 0, -1)
-
+        '''
         skus = []
-
         for sku_id in history:
             sku = SKU.objects.get(id=sku_id)
             skus.append(sku)
+        '''
+        # 组装history列表 使用列表生成式
+        skus = [SKU.objects.get(id=sku_id) for sku_id in history]
         s = SKUSerializer(skus, many=True)
         return Response(s.data)
 
     def post(self, request):
+        # CreateModelMixin里的save方法以使用Serializer里的create方法
         return self.create(request)

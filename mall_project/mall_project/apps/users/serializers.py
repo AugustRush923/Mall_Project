@@ -115,9 +115,6 @@ class UpdatePasswordSerializer(serializers.ModelSerializer):
         return attrs
 
     def update(self, instance, validated_data):
-        validated_data.pop('password')
-        validated_data.pop('confirm_password')
-        print(validated_data)
         instance.set_password(validated_data.get('new_password'))
         instance.save()
         return instance
@@ -173,6 +170,7 @@ class AddressTitleSerializer(serializers.ModelSerializer):
     """
     地址标题
     """
+
     class Meta:
         model = Address
         fields = ('title',)
@@ -215,9 +213,3 @@ class AddUsersHistorySerializer(serializers.Serializer):
         pl.execute()
 
         return validated_data
-
-
-class SKUSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SKU
-        fields = ['id', 'name', 'price', 'default_image_url', 'comments']

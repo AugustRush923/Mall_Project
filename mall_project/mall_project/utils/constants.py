@@ -11,3 +11,6 @@ SMS_CODE_TEMP_ID = 1
 
 # 验证邮件token过期时间
 VERIFY_EMAIL_TOKEN_EXPIRES = 15 * 60
+
+# 用户地址保存最大值
+USER_ADDRESS_COUNTS_LIMIT = 5

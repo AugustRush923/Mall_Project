@@ -2,9 +2,8 @@ from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from users.serializers import SKUSerializer
 from goods.models import SKU, GoodsCategory
-from goods.serializers import ChannelSerializer, CategorySerializer
+from goods.serializers import ChannelSerializer, CategorySerializer, SKUSerializer
 
 # Create your views here.
 
@@ -16,20 +15,23 @@ class SKUListView(ListAPIView):
 
     def get_queryset(self):
         category_id = self.kwargs['category_id']
-        return SKU.objects.filter(category_id=category_id, is_launched=True).order_by('create_time')
+        return SKU.objects.filter(category_id=category_id, is_launched=True)
 
 
 class CategoriesView(GenericAPIView):
     queryset = GoodsCategory.objects.all()
 
     def get(self, request, pk=None):
+        # 创建一个字典
         ret = dict(
             cat1='',
             cat2='',
             cat3=''
         )
+        # 根据pk获取指定category
         category = self.get_object()
         if category.parent is None:
+            # 当parent字段为null 意味第一级
             ret['cat1'] = ChannelSerializer(category.goodschannel_set.all()[0]).data
         elif category.goodscategory_set.count() == 0:
             ret['cat3'] = CategorySerializer(category).data
