@@ -20,6 +20,8 @@ class AreaSubsView(RetrieveAPIView):
 
 # ViewSet形式
 class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):
+    pagination_class = None
+
     # 根据不同action 返回不同queryset
     def get_queryset(self):
         if self.action == "list":

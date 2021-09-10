@@ -29,15 +29,15 @@ var vm = new Vue({
         }
     },
     computed: {
-        sku_amount: function(){
+        sku_amount: function () {
             return (this.sku_price * this.sku_count).toFixed(2);
         }
     },
-    mounted: function(){
+    mounted: function () {
         // 添加用户浏览历史记录
         this.get_sku_id();
         if (this.user_id) {
-            axios.post(this.host+'/browse_histories/', {
+            axios.post(this.host + '/browse_histories/', {
                 sku_id: this.sku_id
             }, {
                 headers: {
@@ -51,13 +51,13 @@ var vm = new Vue({
     },
     methods: {
         // 退出
-        logout: function(){
+        logout: function () {
             sessionStorage.clear();
             localStorage.clear();
             location.href = '/login.html';
         },
         // 控制页面标签页展示
-        on_tab_content: function(name){
+        on_tab_content: function (name) {
             this.tab_content = {
                 detail: false,
                 pack: false,
@@ -67,30 +67,51 @@ var vm = new Vue({
             this.tab_content[name] = true;
         },
         // 从路径中提取sku_id
-        get_sku_id: function(){
+        get_sku_id: function () {
             var re = /^\/goods\/(\d+).html$/;
             this.sku_id = document.location.pathname.match(re)[1];
         },
         // 减小数值
-        on_minus: function(){
+        on_minus: function () {
             if (this.sku_count > 1) {
                 this.sku_count--;
             }
         },
         // 添加购物车
-        add_cart: function(){
-
+        add_cart: function () {
+            axios.post(this.host + '/cart/', {
+                sku_id: parseInt(this.sku_id),
+                count: this.sku_count
+            }, {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+                responseType: 'json',
+                withCredentials: true
+            })
+                .then(response => {
+                    alert('添加购物车成功');
+                    this.cart_total_count += response.data.count;
+                })
+                .catch(error => {
+                    if ('non_field_errors' in error.response.data) {
+                        alert(error.response.data.non_field_errors[0]);
+                    } else {
+                        alert('添加购物车失败');
+                    }
+                    console.log(error.response.data);
+                })
         },
         // 获取购物车数据
-        get_cart: function(){
+        get_cart: function () {
 
         },
         // 获取热销商品数据
-        get_hot_goods: function(){
+        get_hot_goods: function () {
 
         },
         // 获取商品评价信息
-        get_comments: function(){
+        get_comments: function () {
 
         }
     }

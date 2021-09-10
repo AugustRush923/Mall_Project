@@ -11,6 +11,7 @@ from rest_framework.status import *
 
 from .serializers import *
 from .models import User
+from goods.serializers import SKUSerializer
 from mall_project.utils.constants import USER_ADDRESS_COUNTS_LIMIT
 
 
