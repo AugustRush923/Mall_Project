@@ -8,11 +8,13 @@ from rest_framework.mixins import UpdateModelMixin, CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import *
+from rest_framework_jwt.views import ObtainJSONWebToken
 
 from .serializers import *
 from .models import User
 from goods.serializers import SKUSerializer
 from mall_project.utils.constants import USER_ADDRESS_COUNTS_LIMIT
+from mall_project.utils.merge_cart_cookie_to_redis import merge_cart_cookie_to_redis
 
 
 class UserView(CreateAPIView):
@@ -149,3 +151,15 @@ class UserBrowsingHistoryView(CreateModelMixin, GenericAPIView):
     def post(self, request):
         # CreateModelMixin里的save方法以使用Serializer里的create方法
         return self.create(request)
+
+
+class UserAuthorizeView(ObtainJSONWebToken):
+
+    def post(self, request, *args, **kwargs):
+        response = super(UserAuthorizeView, self).post(request, *args, **kwargs)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data.get('user')
+            response = merge_cart_cookie_to_redis(request, user, response)
+        return response
