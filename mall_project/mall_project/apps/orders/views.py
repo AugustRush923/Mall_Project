@@ -29,12 +29,15 @@ class OrderSettlementView(APIView):
         cart_selected = redis_conn.smembers('cart_selected_%s' % user.id)
 
         cart = {}
+        # 把hash中那些勾选商品的sku_id和count取出来包装到一个新字典中
         for sku_id in cart_selected:
             cart[int(sku_id)] = int(redis_cart[sku_id])
 
         # 查询商品信息
         skus = SKU.objects.filter(id__in=cart.keys())
+        # 遍历查询集取出单个模型
         for sku in skus:
+            # 给每个模型定义一个count属性
             sku.count = cart[sku.id]
 
         # 运费

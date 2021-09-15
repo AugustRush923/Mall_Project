@@ -31,7 +31,15 @@ var vm = new Vue({
     computed: {
         sku_amount: function () {
             return (this.sku_price * this.sku_count).toFixed(2);
-        }
+        },
+        total_count: function () {
+            var total = 0;
+            for (var i = 0; i < this.cart.length; i++) {
+                total += parseInt(this.cart[i].count);
+                this.cart[i].amount = (parseFloat(this.cart[i].price) * parseFloat(this.cart[i].count)).toFixed(2);
+            }
+            return total;
+        },
     },
     mounted: function () {
         // 添加用户浏览历史记录
@@ -104,7 +112,22 @@ var vm = new Vue({
         },
         // 获取购物车数据
         get_cart: function () {
-
+            axios.get(this.host + '/cart/', {
+                headers: {
+                    'Authorization': 'JWT ' + this.token
+                },
+                responseType: 'json',
+                withCredentials: true
+            })
+                .then(response => {
+                    this.cart = response.data;
+                    for (var i = 0; i < this.cart.length; i++) {
+                        this.cart[i].amount = (parseFloat(this.cart[i].price) * this.cart[i].count).toFixed(2);
+                    }
+                })
+                .catch(error => {
+                    console.log(error.response.data);
+                })
         },
         // 获取热销商品数据
         get_hot_goods: function () {

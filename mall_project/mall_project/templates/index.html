@@ -53,33 +53,16 @@
                 <li><a href="#">买2免1</a></li>
             </ul>
         </div>
-
         <div class="guest_cart fr">
-            <a href="#" class="cart_name fl">我的购物车</a>
-            <div class="goods_count fl" id="show_count">15</div>
-
-            <ul class="cart_goods_show">
-                <li>
-                    <img src="images/goods/goods001.jpg" alt="商品图片">
-                    <h4>商品名称手机</h4>
-                    <div>4</div>
-                </li>
-                <li>
-                    <img src="images/goods/goods002.jpg" alt="商品图片">
-                    <h4>商品名称手机</h4>
-                    <div>5</div>
-                </li>
-                <li>
-                    <img src="images/goods/goods003.jpg" alt="商品图片">
-                    <h4>商品名称手机</h4>
-                    <div>6</div>
-                </li>
-                <li>
-                    <img src="images/goods/goods003.jpg" alt="商品图片">
-                    <h4>商品名称手机</h4>
-                    <div>6</div>
-                </li>
-            </ul>
+            <a href="cart.html" class="cart_name fl">我的购物车</a>
+            <div class="goods_count fl" id="show_count">[[ total_count ]]</div>
+                <ul class="cart_goods_show">
+                    <li v-for="(sku, index) in cart">
+                        <img :src="sku.default_image_url">
+                        <h4>[[ sku.name ]]</h4>
+                        <div>[[ sku.count ]]</div>
+                    </li>
+                </ul>
         </div>
     </div>
 
