@@ -9,11 +9,12 @@ class CartSerializer(serializers.Serializer):
     selected = serializers.BooleanField(label='是否勾选', default=True)
 
     def validate(self, attrs):
+        # 判断是否有当前id对应的sku
         try:
             sku = SKU.objects.get(id=attrs['sku_id'])
         except SKU.DoesNotExist:
             raise serializers.ValidationError('商品不存在')
-
+        # 判断选购数量是否大于库存
         if attrs['count'] > sku.stock:
             raise serializers.ValidationError('商品库存不足')
 

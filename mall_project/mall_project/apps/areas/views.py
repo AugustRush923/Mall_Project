@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework_extensions.cache.mixins import CacheResponseMixin
@@ -28,7 +27,7 @@ class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):
             # 如果action是list 则查询顶级单位
             return Area.objects.filter(parent__isnull=True).order_by('id')
         elif self.action == "retrieve":
-            # 如果action是retrieve， 则查询所有
+            # 如果action是retrieve， 根据get_object()查询所有
             return Area.objects.all().order_by('id')
 
     # 根据不同action，返回不同Serializer

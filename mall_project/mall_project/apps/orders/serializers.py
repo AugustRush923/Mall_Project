@@ -59,8 +59,9 @@ class SaveOrderSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         # 生成订单编号
         order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S') + ("%09d" % user.id)
-
+        # 从前端获取收货地址信息
         address = validated_data['address']
+        # 从前端获取付款方式信息
         pay_method = validated_data['pay_method']
         # 保存订单基本信息数据 OrderInfo
         # 生成订单
@@ -96,20 +97,21 @@ class SaveOrderSerializer(serializers.ModelSerializer):
                 # 处理订单商品
                 for sku in skus:
                     sku_count = cart[sku.id]
-
+                    # 原始库存
+                    origin_stock = sku.stock
+                    # 原始销量
+                    origin_sales = sku.sales
                     # 判断库存
-                    origin_stock = sku.stock  # 原始库存
-                    origin_sales = sku.sales  # 原始销量
-
                     if sku_count > origin_stock:
                         transaction.savepoint_rollback(save_id)
                         raise serializers.ValidationError('商品库存不足')
 
-                    # 减少库存
+                    # 减少库存，增加销量
+
                     new_stock = origin_stock - sku_count
                     new_sales = origin_sales + sku_count
-
-                    sku.sotck = new_stock
+                    # 修改sku模型的销量与库存
+                    sku.stock = new_stock
                     sku.sales = new_sales
                     sku.save()
 
