@@ -20,9 +20,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'', include('verification.urls')),
     url(r'', include('users.urls')),
-    url(r'', include('areas.urls')),
+    url(r'^areas/', include('areas.urls')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-    url(r'', include('goods.urls')),
-    url(r'', include('cart.urls')),
-    url(r'', include('orders.urls')),
+    url(r'^categories/', include('goods.urls')),
+    url(r'^cart/', include('cart.urls')),
+    url(r'^orders/', include('orders.urls')),
 ]

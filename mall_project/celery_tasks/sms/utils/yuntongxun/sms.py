@@ -1,24 +1,26 @@
 # -*- coding:utf-8 -*-
 
 from .CCPRestSDK import REST
+from django.conf import settings
 
 # 说明：主账号，登陆云通讯网站后，可在"控制台-应用"中看到开发者主账号ACCOUNT SID
-_accountSid = '8aaf07086bb6a176016bcca4758c0ea6'
+_accountSid = settings.accountSid
 
 # 说明：主账号Token，登陆云通讯网站后，可在控制台-应用中看到开发者主账号AUTH TOKEN
-_accountToken = 'c63c9f6b432544aba693e8d93c1de8ae'
+_accountToken = settings.accountToken
 
 # 请使用管理控制台首页的APPID或自己创建应用的APPID
-_appId = '8aaf07086bb6a176016bcca475dd0eac'
+_appId = settings.appId
 
 # 说明：请求地址，生产环境配置成app.cloopen.com
-_serverIP = 'sandboxapp.cloopen.com'
+_serverIP = settings.serverIP
 
 # 说明：请求端口 ，生产环境为8883
-_serverPort = "8883"
+_serverPort = settings.serverPort
 
 # 说明：REST API版本号保持不变
-_softVersion = '2013-12-26'
+_softVersion = settings.softVersion
+
 
 # 云通讯官方提供的发送短信代码实例
 # # 发送模板短信
