@@ -296,7 +296,7 @@ CRONJOBS = [
 CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
 
 # 配置读写分离
-DATABASE_ROUTERS = ['mall_project.utils.db_router.MasterSlaveDBRouter']
+# DATABASE_ROUTERS = ['mall_project.utils.db_router.MasterSlaveDBRouter']
 
 try:
     from .local_settings import *
